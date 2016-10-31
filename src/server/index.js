@@ -15,6 +15,7 @@ var argv = minimist(process.argv.slice(2), {
 });
 
 var server = http.createServer(function(req, res){
+    util.logger(req.url)
     var ip = this.address().address;
     if(ip == "::") ip = "localhost";
     localhost = ip + ":" + this.address().port;

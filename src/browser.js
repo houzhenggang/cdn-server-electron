@@ -7,14 +7,31 @@ const server = require("./server/index")
 server.run(function(host){
   global.host = host;
 })
-//app.commandLine.appendSwitch('--enable-npapi');
-//app.commandLine.appendSwitch('ppapi-flash-path', path.join(__dirname, "tools", "pepflashplayer64_22_0_0_209.dll"));
-//app.commandLine.appendSwitch('ppapi-flash-version', '22.0.0.209');
 
 
 // 保持一个对于 window 对象的全局引用，如果你不这样做，
 // 当 JavaScript 对象被垃圾回收， window 会被自动地关闭
 let mainWindow;
+let shouldQuit = false;
+
+global.updateStatus = (function () {
+    let status = '';
+    return {
+        get () {
+            return status;
+        },
+
+        set (value) {
+            status = value;
+        }
+    };
+})();
+
+global.terminate = function () {
+    shouldQuit = true;
+    app.quit();
+};
+
 function createWindow() {
   // 创建浏览器窗口。
   mainWindow = new BrowserWindow({

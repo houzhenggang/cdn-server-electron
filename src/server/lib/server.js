@@ -9,12 +9,15 @@ var ram = require('./ram');
 var task = require('./task');
 var proxyHandler = require('./proxy');
 var config = require('../config');
+var update = require('./update');
 
 var proxy = httpProxy.createProxyServer({});
 proxy.on('proxyRes', proxyHandler.handler)
 task.runClear(24 * 3 * 3600 * 1000, 3600 * 1000); //过期时间三天
-task.update({page: 4, pageSize: 10})
+task.update({page: 40, pageSize: 10})
 task.runQueue(2)
+update(false)
+
 
 function onProxy(req, res){
     var host = req.headers.host, ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
