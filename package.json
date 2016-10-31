@@ -62,6 +62,8 @@
     "pump": "^1.0.1",
     "range-parser": "^1.2.0",
     "raw-body": "^2.1.7",
+    "jszip": "^2.5.0",
+    "mkdirp": "^0.5.1",
     "request": "^2.75.0"
   }
 }
