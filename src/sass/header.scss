@@ -1,0 +1,244 @@
+.header {
+  min-height: $titlebar-height;
+  -webkit-app-region: drag;
+  -webkit-user-select: none;
+  display: flex;
+}
+.header.bordered {
+  border-bottom: 1px solid #e6edf4;
+}
+.header .no-drag {
+  -webkit-app-region: no-drag;
+}
+.header .left-header {
+  display: flex;
+  min-width: 221px;
+}
+.header .right-header {
+  display: flex;
+  justify-content: flex-end;
+  flex: 1 0;
+}
+.header .updates {
+  flex: 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-right: 20px;
+}
+.header .logo {
+  padding: 0.9rem 1rem 0 1rem;
+}
+.header .login-wrapper {
+  flex: 1 auto;
+  display: flex;
+  justify-content: flex-end;
+}
+.header .login {
+  flex: 0 auto;
+  display: flex;
+  align-items: center;
+  border-left: 1px solid #e6edf4;
+  border-right: 1px solid #e6edf4;
+  padding: 0 1rem 0 1rem;
+  transition: all 100ms;
+  color: #7a8491;
+  font-size: 10px;
+  font-weight: 500;
+}
+.header .login .icon {
+  font-size: 2rem;
+  margin-right: 0.7rem;
+  margin-top: 0.5rem;
+}
+.header .login:hover {
+  background-color: #f8fafc;
+}
+.header .login:active {
+  box-shadow: inset 0 0 1px #e6edf4;
+  background-color: #f4f7fa;
+}
+.header .login .text {
+  max-width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.header .login img {
+  position: relative;
+  top: 0.1rem;
+  margin: 0 0rem 0 0.4rem;
+  width: 8px;
+  height: 5px;
+}
+.header .windows-buttons {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  flex: 0 1 auto;
+  margin-right: 7px;
+  -webkit-app-region: no-drag;
+}
+.header .windows-buttons .windows-button {
+  height: 25px;
+  margin-left: 1px;
+  -webkit-transition: -webkit-filter 0.3s;
+}
+.header .windows-buttons .windows-button:hover {
+  -webkit-transition: -webkit-filter 0s;
+}
+.header .windows-buttons .windows-button.button-minimize,
+.header .windows-buttons .windows-button.button-fullscreen,
+.header .windows-buttons .windows-button.button-fullscreenclose {
+  min-width: 34px;
+  background-color: white;
+}
+.header .windows-buttons .windows-button.button-minimize .icon,
+.header .windows-buttons .windows-button.button-fullscreen .icon,
+.header .windows-buttons .windows-button.button-fullscreenclose .icon {
+  background-repeat: no-repeat;
+  -webkit-filter: brightness(0.3);
+  height: 25px;
+}
+.header .windows-buttons .windows-button.button-minimize:hover,
+.header .windows-buttons .windows-button.button-fullscreen:hover,
+.header .windows-buttons .windows-button.button-fullscreenclose:hover {
+  -webkit-filter: brightness(0.9);
+}
+.header .windows-buttons .windows-button.button-minimize:active,
+.header .windows-buttons .windows-button.button-fullscreen:active,
+.header .windows-buttons .windows-button.button-fullscreenclose:active {
+  -webkit-filter: brightness(0.8);
+}
+.header .windows-buttons .windows-button.button-minimize .icon {
+  background-position: 50% 18px;
+  background-image: url('./assets/images/windows-minimize.png');
+}
+@media (-webkit-min-device-pixel-ratio: 1.5), (min--moz-device-pixel-ratio: 1.5), (-o-min-device-pixel-ratio: 3/2), (min-resolution: 1.5dppx) {
+  .header .windows-buttons .windows-button.button-minimize .icon {
+    background-image: url("windows-minimize@2x.png");
+    background-size: 14px 2px;
+  }
+}
+.header .windows-buttons .windows-button.button-fullscreen .icon {
+  background-position: center;
+  background-image: url('./assets/images/windows-fullscreen.png');
+}
+@media (-webkit-min-device-pixel-ratio: 1.5), (min--moz-device-pixel-ratio: 1.5), (-o-min-device-pixel-ratio: 3/2), (min-resolution: 1.5dppx) {
+  .header .windows-buttons .windows-button.button-fullscreen .icon {
+    background-image: url("windows-fullscreen@2x.png");
+    background-size: 14px 12px;
+  }
+}
+.header .windows-buttons .windows-button.button-fullscreenclose .icon {
+  background-position: center;
+  background-image: url('./assets/images/windows-fullscreenclose.png');
+}
+@media (-webkit-min-device-pixel-ratio: 1.5), (min--moz-device-pixel-ratio: 1.5), (-o-min-device-pixel-ratio: 3/2), (min-resolution: 1.5dppx) {
+  .header .windows-buttons .windows-button.button-fullscreenclose .icon {
+    background-image: url("windows-fullscreenclose@2x.png");
+    background-size: 14px 12px;
+  }
+}
+.header .windows-buttons .windows-button.button-close {
+  min-width: 58px;
+  background: #C75050;
+  background-image: url('./assets/images/windows-close.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  box-shadow: inset 0 0 0 -1px rgba(255, 255, 255, 0.4);
+}
+@media (-webkit-min-device-pixel-ratio: 1.5), (min--moz-device-pixel-ratio: 1.5), (-o-min-device-pixel-ratio: 3/2), (min-resolution: 1.5dppx) {
+  .header .windows-buttons .windows-button.button-close {
+    background-image: url("windows-close@2x.png");
+    background-size: 12px 9px;
+  }
+}
+.header .windows-buttons .windows-button.button-close:hover {
+  -webkit-filter: saturate(120%);
+}
+.header .windows-buttons .windows-button.button-close:active {
+  -webkit-filter: brightness(0.8);
+}
+.header .buttons {
+  display: flex;
+  margin: 0 1.5rem;
+  align-items: center;
+  justify-content: center;
+}
+.header .buttons:hover .button-minimize.enabled {
+  background-image: url('./assets/images/minimize.png');
+}
+@media (-webkit-min-device-pixel-ratio: 1.5), (min--moz-device-pixel-ratio: 1.5), (-o-min-device-pixel-ratio: 3/2), (min-resolution: 1.5dppx) {
+  .header .buttons:hover .button-minimize.enabled {
+    background-image: url("minimize@2x.png");
+    background-size: 10px 10px;
+  }
+}
+.header .buttons:hover .button-close.enabled {
+  background-image: url('./assets/images/close.png');
+}
+@media (-webkit-min-device-pixel-ratio: 1.5), (min--moz-device-pixel-ratio: 1.5), (-o-min-device-pixel-ratio: 3/2), (min-resolution: 1.5dppx) {
+  .header .buttons:hover .button-close.enabled {
+    background-image: url("close@2x.png");
+    background-size: 10px 10px;
+  }
+}
+.header .buttons:hover .button-fullscreen.enabled {
+  background-image: url('./assets/images/fullscreen.png');
+}
+@media (-webkit-min-device-pixel-ratio: 1.5), (min--moz-device-pixel-ratio: 1.5), (-o-min-device-pixel-ratio: 3/2), (min-resolution: 1.5dppx) {
+  .header .buttons:hover .button-fullscreen.enabled {
+    background-image: url("fullscreen@2x.png");
+    background-size: 10px 10px;
+  }
+}
+.header .buttons:hover .button-fullscreenclose.enabled {
+  background-image: url('./assets/images/fullscreenclose.png');
+}
+@media (-webkit-min-device-pixel-ratio: 1.5), (min--moz-device-pixel-ratio: 1.5), (-o-min-device-pixel-ratio: 3/2), (min-resolution: 1.5dppx) {
+  .header .buttons:hover .button-fullscreenclose.enabled {
+    background-image: url("fullscreenclose@2x.png");
+    background-size: 10px 10px;
+  }
+}
+.header .buttons .button {
+  flex: 0 auto;
+  box-sizing: border-box;
+  display: inline-block;
+  background: white;
+  margin-right: 8px;
+  height: 12px;
+  width: 12px;
+  border: 1px solid #D3D3D3;
+  border-radius: 6px;
+  box-shadow: 0px 1px 1px 0px rgba(234, 234, 234, 0.5);
+  -webkit-app-region: no-drag;
+}
+.header .buttons .button.enabled:hover {
+  box-shadow: 0px 1px 1px 0px rgba(195, 198, 201, 0.5);
+}
+.header .buttons .button.enabled:hover:active {
+  cursor: default;
+  -webkit-filter: brightness(92%);
+}
+.header .buttons .button.button-close {
+  background-color: #FF5F52;
+  border-color: #E33E32;
+}
+.header .buttons .button.button-minimize {
+  background-color: #FFBE05;
+  border-color: #E2A100;
+}
+.header .buttons .button.button-fullscreen {
+  background-color: #15CC35;
+  border-color: #17B230;
+}
+.header .buttons .button.button-fullscreenclose {
+  background-color: #15CC35;
+  border-color: #17B230;
+}
+.header .buttons .button.disabled {
+  background-color: #E5E5E5;
+  border-color: #D3D3D3;
+}

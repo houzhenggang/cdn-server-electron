@@ -1,0 +1,83 @@
+@import 'normalize';
+@import 'dragula';
+@import 'codemirror';
+@import 'react-select';
+
+$sidebar-width: 240px;
+$titlebar-height: 44px;
+$settings-links-width: 160px;
+
+$color-theme: rgb(2, 187, 0);
+$color-theme-red: rgb(253, 65, 33);
+$color-theme-blue: rgb(0, 169, 253);
+$background-dark: rgb(58, 58, 58);
+$background-light: rgb(242, 242, 242);
+$text-light: rgb(208, 208, 208);
+$text-grey: rgb(99, 104, 110);
+$text-dark: rgb(30, 30, 30);
+$border-light: rgb(221, 221, 221);
+$titlebar-background: #f60;
+$titlebar-color: #fff;
+
+
+#app {
+    -webkit-app-region: no-drag;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    border-radius: 4px;
+    box-shadow: inset 0 0 1px rgba(0, 0, 0, 0.4),
+                0 0 15px rgba(0, 0, 0, 0.1);
+    &.maximized {
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    }
+}
+
+.header-container,
+.settings-container {
+    top: 1px;
+    left: 1px;
+    right: 1px;
+    bottom: 1px;
+    overflow: hidden;
+    position: absolute;
+    background-color: $background-light;
+    .titlebar {
+        -webkit-app-region: drag;
+        top: 0;
+        left: 0;
+        right: 0;
+        position: absolute;
+        background: $titlebar-background;
+        color: $titlebar-color;
+        height: $titlebar-height;
+        .titlebar-title {
+            text-align: center;
+            line-height: $titlebar-height - 1px;
+        }
+        .window-controls {
+            top: 12px;
+            right: 12px;
+            position: absolute;
+            -webkit-app-region: no-drag;
+            .iconfont {
+                cursor: pointer;
+                font-size: 20px;
+                transition: color 0.2s ease;
+                &:hover {
+                    color: $color-theme;
+                }
+            }
+            .close:hover {
+                color: rgb(242, 85, 97);
+            }
+        }
+    }
+}
+
