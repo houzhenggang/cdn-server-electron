@@ -42,8 +42,13 @@ module.exports.runTask = function(task, worker, i){
 }
 
 module.exports.preload = function(link, res, callback){
-    util.logger(link)
-    request(link).on("response", function(response){
+    var ipLink = link.replace(config.REMOTE_HOST, config.REMOTE_IP)
+    request({
+        url: ipLink,
+        headers:{
+            "Host": config.REMOTE_HOST.replace("http://", ""),
+        }
+    }).on("response", function(response){
         var stream = this;
         var code = response.statusCode;
         if(code == 200 || code == 206){
@@ -66,8 +71,9 @@ module.exports.preload = function(link, res, callback){
 module.exports.runClear = function(overTime, interval){
     try{
         setInterval(function(){
-            ram.clear(overTime)
-            ram.clearLoss(overTime)
+            ram.clear(overTime, function(){
+                ram.clearLoss(overTime)
+            })
         }, interval);
     }catch(e){
         util.error(e)

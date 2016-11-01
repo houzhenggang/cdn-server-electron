@@ -36,17 +36,14 @@ var App = React.createClass({
 
     return (
         <div>
-            <div>
-                <Sidebar list={ list } />
-            </div>
-                <div className="main-container ">
-                    <Header hideLogin={true}/>
-                    <div className="content-container ">
-                        <div className="list">
-                            <RouteHandler />
-                        </div>
+            <div className="main-container ">
+                <Header title="视频缓存加速" hideLogin={true}/>
+                <div className="content-container ">
+                    <div className="list">
+                        <RouteHandler />
                     </div>
                 </div>
+            </div>
         </div>
       );
     }

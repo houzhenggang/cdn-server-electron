@@ -47,18 +47,29 @@ module.exports.bind = function(obj){
         this.cacheLength = size;
     }
     obj.destroy = function(){
-        util.logger("Unlink: " + this.getCacheFile())
-        util.unlink(this.getCacheFile())
-        util.unlink(this.getTempFile())
+        var cacheFile = this.getCacheFile()
+        if(cacheFile){
+            util.logger("Unlink: " + cacheFile)
+            util.unlink(cacheFile)
+        }
+        this.deleteTemp();
     }
     obj.setStatus = function(status){
         this.status = status
     }
     obj.rename = function(oldPath, newPath){
         fs.renameSync(oldPath, newPath)
+        this.tempFile = null
     }
     obj.save = function(callback){
         module.exports.update(this.id, this)
+    }
+    obj.deleteTemp = function(){
+        var tempFile = this.getTempFile()
+        if(tempFile){
+            util.logger("Unlink: " + tempFile)
+            util.unlink(tempFile)
+        }
     }
     return obj;
 }
@@ -119,20 +130,30 @@ module.exports.update = function(id, obj, callback){
     });
 }
 
-module.exports.clear = function(overTime){
+module.exports.getList = function(condition, sort, page, pageSize, callback){
+    callback = callback || function(){}
+    pageSize = Math.min(Math.max(parseInt(pageSize), 1), 100);
+    var offset = Math.max((parseInt(page)-1) * parseInt(pageSize), 0);
+    db.find(condition).sort(sort).skip(offset).limit(pageSize).exec(function(err, data){
+        callback(data);
+    });
+}
+
+module.exports.clear = function(overTime, callback){
+    if(!callback) callback = function(){}
     db.find({createTime: {$lt: new Date().getTime()-overTime}}, function (err, docs) {
         for(key in docs){
             var item = module.exports.bind(docs[key])
             item.destroy()
             module.exports.delete(item.id)
         }
+        callback()
     })
 }
 
 module.exports.clearLoss = function(overTime){
     var path = module.exports.getPath()
     fs.readdir(path, function(err, files){
-        util.logger(files)
         if(err){
             util.error("ReadDir Error: " + err)
         }else{

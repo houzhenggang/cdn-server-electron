@@ -1,8 +1,8 @@
 var config = {}
 
-config.APP_NAME = 'Hozz';
-config.APP_VERSION = '0.0.1';
-config.APP_RELEASES_URL = `https://api.github.com/repos/ppoffice/${ config.APP_NAME }/releases`;
+config.APP_NAME = 'cdn-server-electron';
+config.APP_VERSION = '0.0.2';
+config.APP_RELEASES_URL = 'https://api.github.com/repos/pk8est/cdn-server-electron/releases';
 config.MATEDATA_SAVE_DIR = "D:\\cdn-server\\"
 config.MATEDATA_DEFAULT_SIZE = 1024 * 1024 * 10
 config.MATEDATA_OVER_SIZE = 1024 * 1024 * 3 

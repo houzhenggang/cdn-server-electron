@@ -51,17 +51,17 @@ class Header extends Component {
         if (util.isWindows()) {
           buttons = (
             <div className="windows-buttons">
-            <div className="windows-button button-minimize enabled" onClick={this.handleMinimize.bind(this)}><div className="icon"></div></div>
-            <div className={`windows-button ${this.state.fullscreen ? 'button-fullscreenclose' : 'button-fullscreen'} enabled`} onClick={this.handleFullscreen.bind(this)}><div className="icon"></div></div>
-            <div className="windows-button button-close enabled" onClick={this.handleClose}></div>
+                {/*<div className="windows-button button-minimize enabled" onClick={this.handleMinimize.bind(this)}><div className="icon"></div></div>*/}
+                {/*<div className={`windows-button ${this.state.fullscreen ? 'button-fullscreenclose' : 'button-fullscreen'} enabled`} onClick={this.handleFullscreen.bind(this)}><div className="icon"></div></div>*/}
+                <div className="windows-button button-close enabled" onClick={this.handleClose}></div>
             </div>
           );
         } else {
           buttons = (
             <div className="buttons">
-            <div className="button button-close enabled" onClick={this.handleClose.bind(this)}></div>
-            <div className="button button-minimize enabled" onClick={this.handleMinimize.bind(this)}></div>
-            <div className="button button-fullscreen enabled" onClick={this.handleFullscreen.bind(this)}></div>
+                <div className="button button-close enabled" onClick={this.handleClose.bind(this)}></div>
+                {/*<div className="button button-minimize enabled" onClick={this.handleMinimize.bind(this)}></div>*/}
+                {/*<div className="button button-fullscreen enabled" onClick={this.handleFullscreen.bind(this)}></div>*/}
             </div>
           );
         }

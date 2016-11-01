@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import electron, { ipcRenderer, remote} from 'electron';
+import config, { APP_VERSION } from '../../server/config';
+import update from '../backend/update';
 const channel = "selected-save-file-path-directory";
 const host = "http://" + remote.getGlobal('host');
 
@@ -16,8 +18,21 @@ class HomePage extends Component {
         ipcRenderer.send('open-file-dialog', channel);
     }
 
+    handleCheckUpdate(){
+        update(true)
+    }
+
+    handleClearCache(){
+        let value = this.refs.clearCache.getDOMNode().value
+        fetch(host + '/clearCache?time='+value).then(function(res) {
+            return res.json();
+        }).then(function(data) {
+            alert(data.message)
+        });
+    }
+
     componentDidMount() {
-        var self = this;
+        let self = this;
         ipcRenderer.removeAllListeners(channel).on(channel, this.setFileSavePath.bind(this));
         this.getRemoteSettingPath(function(value){
             self.setState({fileSavePath: value})
@@ -33,7 +48,7 @@ class HomePage extends Component {
     }
 
     setFileSavePath(event, path){
-        var self = this;
+        let self = this;
         if(path[0]){
             fetch(host + '/setFileSavePath?value='+path[0]).then(function(res) {
                 return res.json();
@@ -45,14 +60,34 @@ class HomePage extends Component {
 
 	render() {
 		return (
-			<div className="">
-                <section id="">
-                    <span className="section-title inline">文件保存路径</span>
-                    <input type="text" className="input-file" disabled value={this.state.fileSavePath} name="fileSavePath"/> 
-                    <button onClick={this.handleSelectFileSavePath.bind(this, this.state.fileSavePath)}>
-                        选择路径
-                    </button>
-                </section>
+            <div className="settings-container">
+			    <div className="settings">
+                    <section id="">
+                        <span className="section-title inline"> 当前版本号 </span>
+                        <input type="text" className="" disabled value={APP_VERSION} name=""/> 
+                        <button className="btn btn-info" onClick={this.handleCheckUpdate.bind(this)}>
+                            检查更新
+                        </button>
+                    </section>
+                    <section id="">
+                        <span className="section-title inline">文件保存路径</span>
+                        <input type="text" className="" disabled value={this.state.fileSavePath} name="fileSavePath"/> 
+                        <button className="btn btn-info" onClick={this.handleSelectFileSavePath.bind(this, this.state.fileSavePath)}>
+                            选择路径
+                        </button>
+                    </section>
+                    <section id="">
+                        <span className="section-title inline"> 清除缓存文件 </span>
+                        <select ref="clearCache">
+                            <option value="1">一天前的缓存</option>
+                            <option value="3">三天前的缓存</option>
+                            <option value="all">所有缓存</option>
+                        </select> 
+                        <button className="btn btn-info" onClick={this.handleClearCache.bind(this)}>
+                            清除缓存
+                        </button>
+                    </section>
+                </div>
             </div>
 		);
 	}

@@ -6,6 +6,8 @@ import React from 'react';
 import Router from 'react-router';
 import routes from './routes';
 import routerContainer from './router';
+import update from './backend/update';
+
 
 var router = Router.create({
   routes: routes
@@ -13,3 +15,4 @@ var router = Router.create({
 router.run(Handler => React.render(<Handler/>, document.body));
 
 routerContainer.set(router);
+update(false)

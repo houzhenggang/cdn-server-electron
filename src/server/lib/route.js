@@ -7,6 +7,15 @@ var route = require("./router");
 var proxyHandler = require('./proxy');
 var task = require('./task');
 
+route.get("/getList", function(req, res){
+    var condition = req.params.get("condition", {})
+    var page = parseInt(req.params.get("page", 1))
+    var pageSize = parseInt(req.params.get("pageSize", 20))
+    ram.getList(condition, {createTime: 1}, page, pageSize, function(data){
+        res.jsonOutput({status:1, data: data});
+    })
+});
+
 route.get("/clear", function(req, res){
     var overtime = req.params.get("overtime", 24 * 3600)
     ram.clear(overtime * 1000)
@@ -97,4 +106,16 @@ route.get("/test", function(req, res){
     }
 });
 
-
+route.get("/clearCache", function(req, res){
+    var time = req.params.get("time")
+    var overTime =  24 * 3600 * 1000;
+    if(time == "all"){
+        time = 0
+    }else{
+        time = parseInt(time)
+    }
+    ram.clear(overTime * time, function(){
+        ram.clearLoss(overTime * time)
+    })
+    res.jsonOutput({"status": 1, "message": "清除缓存成功!"});
+})

@@ -3,11 +3,12 @@ const electron = require('electron');
 const {app, ipcMain, dialog} = electron;
 // 创建原生浏览器窗口的模块。
 const {BrowserWindow} = electron;
-const server = require("./server/index")
+const server = require("./server/boot")
+
+global.dirname = __dirname
 server.run(function(host){
   global.host = host;
 })
-
 
 // 保持一个对于 window 对象的全局引用，如果你不这样做，
 // 当 JavaScript 对象被垃圾回收， window 会被自动地关闭
@@ -35,8 +36,8 @@ global.terminate = function () {
 function createWindow() {
   // 创建浏览器窗口。
   mainWindow = new BrowserWindow({
-        width: 920,
-        height: 640,
+        width: 600,
+        height: 400,
         frame: false,
         //transparent: true,
   });

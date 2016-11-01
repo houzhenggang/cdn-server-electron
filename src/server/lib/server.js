@@ -9,14 +9,12 @@ var ram = require('./ram');
 var task = require('./task');
 var proxyHandler = require('./proxy');
 var config = require('../config');
-var update = require('./update');
 
 var proxy = httpProxy.createProxyServer({});
 proxy.on('proxyRes', proxyHandler.handler)
 task.runClear(24 * 3 * 3600 * 1000, 3600 * 1000); //过期时间三天
 task.update({page: 40, pageSize: 10})
 task.runQueue(2)
-update(false)
 
 
 function onProxy(req, res){
@@ -31,7 +29,7 @@ function onHttp(req, res){
         url: link,
         headers:{
             'Range': req.headers['range'],
-            "Host": "dot.dwstatic.com",
+            "Host": config.REMOTE_HOST.replace("http://", ""),
         }
     }).on("response", function(response){
         if(!response.headers["content-range"]) {
@@ -62,7 +60,7 @@ function handler(link, req, res, onRemote){
                         res.statusCode = 206
                         res.setHeader('Accept-Ranges', 'bytes')
                         res.setHeader('Content-Type', 'video/mp4')
-                        if(req.headers['user-agent'].indexOf("Firefox") != -1){
+                        if(req.headers['user-agent'] && req.headers['user-agent'].indexOf("Firefox") != -1){
                             res.setHeader('Content-Length', cacheFile.length - range.start + 1)
                             res.setHeader('Content-Range', 'bytes ' + range.start + '-' + cacheFile.length + '/' + cacheFile.length)
                         }else{

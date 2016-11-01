@@ -6,6 +6,7 @@ var config = require('../config');
 
 module.exports.handler = function(proxyRes, req, res, options){
     try{
+        var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
         module.exports.process(req.url, proxyRes, res)
     }catch(e){
         util.error(e)
@@ -35,9 +36,10 @@ module.exports.process = function(link, response, res, cb){
 
     if(!cacheFile || !cacheFile.id) return
     try{
+        var end = false;
         response.on('data',function(chunk){
             var start = util.getRangeStart(response.headers["content-range"])
-            if(start == 0){
+            if(start == 0 && !end){
                 if(first == false){
                     first = true
                     mateDataSize = util.getMateDataSize(chunk) + config.MATEDATA_OVER_SIZE
@@ -48,6 +50,7 @@ module.exports.process = function(link, response, res, cb){
                     fs.writeSync(fd, new Buffer(chunk), 0, chunk.length, size);
                     size += chunk.length;
                 }else{
+                    end = true;
                     cacheFile.setCacheLength(size)
                     cacheFile.setStatus(9)
                     try{
@@ -57,15 +60,17 @@ module.exports.process = function(link, response, res, cb){
                         cb()
                     }catch(e){
                         util.error(e)
+                        fd = closeFd(fd)
                     }
                 }
             }
 
-            res.on("close", function(){
-                fd = closeFd(fd)
-                cb()
-            });
         })
+        res.on("close", function(){
+            fd = closeFd(fd)
+            cacheFile.deleteTemp()
+            cb()
+        });
     }catch(e){
         cacheFile.destroy()
         fd = closeFd(fd)
