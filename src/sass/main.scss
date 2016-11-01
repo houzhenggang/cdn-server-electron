@@ -22,18 +22,19 @@ $border-light: rgb(221, 221, 221);
 body{
     background: #e8e8e8;
     .settings-container{
-        margin-top: 30px;
+        margin-top: 50px;
         section{
+            margin-top: 5px;
             .section-title {
                 display: inline-block;
                 margin-bottom: 10px;
-                width: 180px;
+                width: 160px;
                 text-align: right;
                 margin-right: 10px;
             }
             input{
                 padding: 9px 10px;
-                width: 200px;
+                width: 220px;
                 border-radius: 3px;
                 background-color: white;
                 border: 1px solid #ddd;
@@ -41,7 +42,7 @@ body{
             }
             select{
                 padding: 9px 10px;
-                width: 200px;
+                width: 220px;
                 border-radius: 3px;
                 background-color: white;
                 border: 1px solid #ddd;

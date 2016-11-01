@@ -1,31 +1,30 @@
 {
-  "name": "hot-app",
+  "name": "cdn-server-electron",
   "version": "0.1.3",
   "description": "A better way to manage your hosts.",
   "main": "browser.js",
   "scripts": {
     "start": "electron ./app/browser.js -p 80",
     "dev": "electron . --debug",
-    "pack-mac": "electron-packager ./app hot-app --asar --asar-unpack-dir=tools  --overwrite --platform=x64 --arch=ia32 --icon=app/assets/images/icpn.ico --prune=true --out=out",
-    "pack-win": "electron-packager ./app hot-app --asar --asar-unpack-dir=tools --overwrite --platform=win32 --arch=ia32 --icon=app/assets/images/icpn.ico --prune=true --out=out",
+    "pack-mac": "electron-packager ./app cdn-server-electron --asar --asar-unpack-dir=tools  --overwrite --platform=x64 --arch=ia32 --icon=app/assets/images/icpn.ico --prune=true --out=out",
+    "pack-win": "electron-packager ./app cdn-server-electron --asar --asar-unpack-dir=tools --overwrite --platform=win32 --arch=ia32 --icon=app/assets/images/icpn.ico --prune=true --out=out",
     "installer": "node ./script/installer.js",
     "package": "npm run pack-mac && npm run pack-win"
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:ppoffice/Hozz.git"
+    "url": "git@github.com:pk8est/cdn-server-electron.git"
   },
   "keywords": [
     "Electron",
-    "hosts",
-    "all-platform"
+    "cdn cache"
   ],
-  "author": "PPOffice",
+  "author": "pk8est",
   "license": "BSD-3-Clause",
   "bugs": {
-    "url": "https://github.com/ppoffice/Hozz/issues"
+    "url": "https://github.com/pk8est/cdn-server-electron/issues"
   },
-  "homepage": "https://github.com/ppoffice/Hozz#readme",
+  "homepage": "https://github.com/pk8est/cdn-server-electron",
   "devDependencies": {
     "babel-core": "^6.3.26",
     "babel-loader": "^6.2.0",
@@ -56,14 +55,15 @@
   },
   "dependencies": {
     "http-proxy": "^1.15.2",
+    "jszip": "^2.5.0",
+    "line-reader": "^0.4.0",
     "log4js": "^0.6.38",
     "minimist": "^1.2.0",
+    "mkdirp": "^0.5.1",
     "nedb": "^1.8.0",
     "pump": "^1.0.1",
     "range-parser": "^1.2.0",
     "raw-body": "^2.1.7",
-    "jszip": "^2.5.0",
-    "mkdirp": "^0.5.1",
     "request": "^2.75.0"
   }
 }

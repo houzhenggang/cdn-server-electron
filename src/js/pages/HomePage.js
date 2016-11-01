@@ -1,5 +1,7 @@
+import fs from 'fs';
 import React, { Component } from 'react';
 import electron, { ipcRenderer, remote} from 'electron';
+import lineReader from 'line-reader';
 import config, { APP_VERSION } from '../../server/config';
 import update from '../backend/update';
 const channel = "selected-save-file-path-directory";
@@ -11,7 +13,17 @@ class HomePage extends Component {
         super(props);
         this.state = {
             fileSavePath: "",
+            bindHost: "",
         };
+        this.handlebindHost(true)
+    }
+
+    getHostPath(){
+        return "C:\\Windows\\System32\\drivers\\etc\\hosts";
+    }
+
+    getBindHost(){
+        return remote.getGlobal('host').split(":")[0] + " " + config.REMOTE_HOST.replace("http://", "")
     }
 
     handleSelectFileSavePath(filePath){
@@ -28,6 +40,33 @@ class HomePage extends Component {
             return res.json();
         }).then(function(data) {
             alert(data.message)
+        });
+    }
+
+    handlebindHost(check){
+        let self = this;
+        let ip = remote.getGlobal('host').split(":")[0]
+        let host = config.REMOTE_HOST.replace("http://", "");
+        let hostText = "";
+        let setting = false;
+        let hostFile = this.getHostPath();
+        lineReader.eachLine(hostFile, function(line, last) {
+            if(line.indexOf(ip) != -1 && line.indexOf(host) != -1){
+                if(check && line.indexOf("#") != 0){
+                    self.setState({bindHost: self.getBindHost()})
+                    return false
+                }
+            }else{
+                hostText = hostText + line + "\r\n";
+            }
+            if(last){
+                if(check) return false;
+                hostText = self.state.bindHost ? hostText : `${hostText}${ip} ${host}\r\n`;
+                fs.writeFile(hostFile, hostText, function(err){
+                    if(err) console.error(err)
+                    else self.setState({bindHost: self.state.bindHost ? "" : self.getBindHost()})
+                })
+            }
         });
     }
 
@@ -79,12 +118,19 @@ class HomePage extends Component {
                     <section id="">
                         <span className="section-title inline"> 清除缓存文件 </span>
                         <select ref="clearCache">
-                            <option value="1">一天前的缓存</option>
-                            <option value="3">三天前的缓存</option>
+                            <option value="3">3天前的缓存</option>
+                            <option value="7">7天前的缓存</option>
                             <option value="all">所有缓存</option>
                         </select> 
                         <button className="btn btn-info" onClick={this.handleClearCache.bind(this)}>
                             清除缓存
+                        </button>
+                    </section>
+                    <section id="">
+                        <span className="section-title inline">绑定HOST</span>
+                        <input type="text" className="" disabled value={this.state.bindHost} name=""/> 
+                        <button className={this.state.bindHost ? "btn btn-info" : "btn"} onClick={this.handlebindHost.bind(this, false)}>
+                            {this.state.bindHost ? "取消绑定" : "绑定域名"}
                         </button>
                     </section>
                 </div>

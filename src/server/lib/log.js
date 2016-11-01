@@ -5,12 +5,22 @@ log4js.configure({
     { type: 'console' }, //控制台输出
     {
       type: 'file', //文件输出
-      filename: 'log.log', 
-      category: 'logDebug',
+      filename: './log/info.log', 
+      category: 'debug',
+      maxLogSize: 1024,
       replaceConsole: true,  
-      levels: { "logDebug": "DEBUG", "logInfo": "DEBUG", "logWarn": "DEBUG", "logErr": "DEBUG"}
+      levels: { "debug": "DEBUG"}
+    },
+    {
+      type: 'file', //文件输出
+      filename: './log/error.log', 
+      category: 'error',
+      maxLogSize: 1024,
+      replaceConsole: true,  
+      levels: { "error": "ERROR"}
     }
   ]
 });
 
-module.exports = log4js.getLogger("logDebug");
+module.exports.debug = log4js.getLogger('debug');
+module.exports.error = log4js.getLogger('error');

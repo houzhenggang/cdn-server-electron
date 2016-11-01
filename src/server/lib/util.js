@@ -2,14 +2,14 @@ var fs = require("fs")
 var path = require("path")
 var crypto = require('crypto');
 var config = require('../config');
-var logger = require('./log');
+var { debug, error } = require('./log');
 
 module.exports.logger = function(log){
-    if(log) logger.debug(log)
+    if(log) debug.debug(log)
 }
 
 module.exports.error = function(error){
-    if(error) logger.debug("ERROR: ", error)
+    if(error) error.error("ERROR: ", error)
 }
 
 module.exports.getId = function(link){
@@ -92,7 +92,7 @@ module.exports.mkdirsSync = function(dirname, mode){
     if(fs.existsSync(dirname)){
         return true;
     }else{
-        if(util.mkdirsSync(Path.dirname(dirname), mode)){
+        if(module.exports.mkdirsSync(path.dirname(dirname), mode)){
             fs.mkdirSync(dirname, mode);
             return true;
         }

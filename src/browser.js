@@ -1,9 +1,29 @@
+const path = require('path');
 const electron = require('electron');
-// 控制应用生命周期的模块。
-const {app, ipcMain, dialog} = electron;
-// 创建原生浏览器窗口的模块。
-const {BrowserWindow} = electron;
 const server = require("./server/boot")
+const {app, ipcMain, BrowserWindow, dialog, Tray, Menu, MenuItem} = electron;
+
+if (handleSquirrelEvent()) {
+  return;
+}
+
+var shouldStartInstance = app.makeSingleInstance(function(commandLine, workingDirectory) {
+    if (mainWindow) {
+        if (!mainWindow.isVisible()) {
+            mainWindow.show();
+        }
+        if (mainWindow.isMinimized()) {
+            mainWindow.restore();
+        }
+        mainWindow.focus();
+    }
+    return true;
+});
+
+if (shouldStartInstance) {
+    quit();
+    return;
+}
 
 global.dirname = __dirname
 server.run(function(host){
@@ -13,6 +33,7 @@ server.run(function(host){
 // 保持一个对于 window 对象的全局引用，如果你不这样做，
 // 当 JavaScript 对象被垃圾回收， window 会被自动地关闭
 let mainWindow;
+let exiting = false;
 let shouldQuit = false;
 
 global.updateStatus = (function () {
@@ -30,8 +51,13 @@ global.updateStatus = (function () {
 
 global.terminate = function () {
     shouldQuit = true;
-    app.quit();
+    quit();
 };
+
+function quit(){
+    exiting = true;
+    app.quit();
+}
 
 function createWindow() {
   // 创建浏览器窗口。
@@ -41,39 +67,65 @@ function createWindow() {
         frame: false,
         //transparent: true,
   });
-  //mainWindow.setMenuBarVisibility(false)
-  // 加载应用的 index.html。
   mainWindow.loadURL(`file://${__dirname}/index.html`);
 
-  // 启用开发工具。
   mainWindow.webContents.openDevTools();
 
-  // 当 window 被关闭，这个事件会被触发。
   mainWindow.on('closed', () => {
-    // 取消引用 window 对象，如果你的应用支持多窗口的话，
-    // 通常会把多个 window 对象存放在一个数组里面，
-    // 与此同时，你应该删除相应的元素。
     mainWindow = null;
   });
+  createTray();
 }
 
-// Electron 会在初始化后并准备
-// 创建浏览器窗口时，调用这个函数。
-// 部分 API 在 ready 事件触发后才能使用。
+function createTray(){
+   const appIcon = new Tray(path.join(__dirname, './assets/images/icon.png'));
+    var trayMenu = new Menu()
+    trayMenu.append(new MenuItem({
+      label: '显示',
+      click: function () {
+        if(!exiting){
+            mainWindow.show();
+        }else{
+            dialog.showErrorBox('错误', '应用正在退出.')
+        }
+      }
+    }))
+    trayMenu.append(new MenuItem({
+      label: '隐藏',
+      click: function () {
+        mainWindow.hide();
+      }
+    }))
+    trayMenu.append(new MenuItem({
+      label: '退出',
+      click: function () {
+          quit();
+      }
+    }));
+    trayMenu.append(new MenuItem({
+      label: '强制退出',
+      click: function () {
+          app.exit(0)
+      }
+    }));
+    appIcon.setContextMenu(trayMenu)
+    appIcon.on('click', function (e) {
+        e.preventDefault()
+        //mainWindow.show();
+        appIcon.popUpContextMenu(trayMenu)
+    })
+
+}
+
 app.on('ready', createWindow);
 
-// 当全部窗口关闭时退出。
 app.on('window-all-closed', () => {
-  // 在 macOS 上，除非用户用 Cmd + Q 确定地退出，
-  // 否则绝大部分应用及其菜单栏会保持激活。
   if (process.platform !== 'darwin') {
     app.quit();
   }
 });
 
 app.on('activate', () => {
-  // 在 macOS 上，当点击 dock 图标并且该应用没有打开的窗口时，
-  // 绝大部分应用会重新创建一个窗口。
   if (mainWindow === null) {
     createWindow();
   }
@@ -87,5 +139,66 @@ ipcMain.on('open-file-dialog', function (event, channel) {
     })
 });
 
-// 在这文件，你可以续写应用剩下主进程代码。
-// 也可以拆分成几个文件，然后用 require 导入。
+function handleSquirrelEvent() {
+  if (process.argv.length === 1) {
+    return false;
+  }
+
+  const ChildProcess = require('child_process');
+  const path = require('path');
+
+  const appFolder = path.resolve(process.execPath, '..');
+  const rootAtomFolder = path.resolve(appFolder, '..');
+  const updateDotExe = path.resolve(path.join(rootAtomFolder, 'Update.exe'));
+  const exeName = path.basename(process.execPath);
+  //const exeName = path.basename("DotApp.exe");
+
+  const spawn = function(command, args) {
+    let spawnedProcess, error;
+
+    try {
+      spawnedProcess = ChildProcess.spawn(command, args, {detached: true});
+    } catch (error) {}
+
+    return spawnedProcess;
+  };
+
+  const spawnUpdate = function(args) {
+    return spawn(updateDotExe, args);
+  };
+
+  const squirrelEvent = process.argv[1];
+  switch (squirrelEvent) {
+    case '--squirrel-install':
+    case '--squirrel-updated':
+      // Optionally do things such as:
+      // - Add your .exe to the PATH
+      // - Write to the registry for things like file associations and
+      //   explorer context menus
+
+      // Install desktop and start menu shortcuts
+      spawnUpdate(['--createShortcut', exeName]);
+
+      setTimeout(app.quit, 1000);
+      return true;
+
+    case '--squirrel-uninstall':
+      // Undo anything you did in the --squirrel-install and
+      // --squirrel-updated handlers
+
+      // Remove desktop and start menu shortcuts
+      spawnUpdate(['--removeShortcut', exeName]);
+
+      setTimeout(app.quit, 1000);
+      return true;
+
+    case '--squirrel-obsolete':
+      // This is called on the outgoing version of your app before
+      // we update to the new version - it's the opposite of
+      // --squirrel-updated
+
+      app.quit();
+      return true;
+  }
+};
+
