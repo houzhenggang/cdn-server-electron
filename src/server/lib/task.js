@@ -59,6 +59,7 @@ module.exports.runTask = function(task, worker, i){
     var id = util.md5(url.parse(link).path)
     ram.get(id, function(item){
         if(item == null){
+            util.logger("Add cache: " + link)
             module.exports.preload(link, new events.EventEmitter(), function(err){
                 if(err) util.error(err)
                 worker.run(module.exports.runTask, i);

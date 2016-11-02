@@ -58,7 +58,6 @@ function handler(link, req, res, onRemote){
                     if(range && (range.start > cacheFile.mateDataSize || range.start > file.length )){
                         return onRemote(req, res)
                     }else{
-                        console.info(range)
                         if (!range) range = {start:0, end:cacheFile.cacheLength}
                         res.statusCode = 206
                         res.setHeader('Accept-Ranges', 'bytes')
@@ -72,13 +71,14 @@ function handler(link, req, res, onRemote){
                         }
 
                         var size = 0;
+                        var chunks = []
                         file.createReadStream(range).on("data", function(chunk){
                             size += chunk.length
                             res.write(chunk)
                             if(size >= cacheFile.cacheLength){
                                 request({
                                     url: link,
-                                    headers:{'Range': 'bytes='+(cacheFile.cacheLength+1)+'-'}
+                                    headers:{'Range': 'bytes='+(cacheFile.cacheLength)+'-'}
                                 }).on("response", function(response){
                                     response.on("data", function(nextChunk){
                                         res.write(nextChunk)
