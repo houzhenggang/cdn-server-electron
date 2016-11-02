@@ -46,6 +46,7 @@ function handler(link, req, res, onRemote){
     if (req.headers.origin) res.setHeader('Access-Control-Allow-Origin', req.headers.origin)
     var id = util.md5(url.parse(link).path)
     ram.get(id, function(cacheFile){
+        var end = false;
         if(!cacheFile || cacheFile.status!=9) return onRemote(req, res)
         try{
             util.stat(cacheFile.getCacheFile(), function(file){
@@ -81,9 +82,9 @@ function handler(link, req, res, onRemote){
                                 }).on("response", function(response){
                                     response.on("data", function(nextChunk){
                                         res.write(nextChunk)
-                                    })
-                                    response.on("close", function(){
-                                        res.end();
+                                        if(end){
+                                            response.emit("end");
+                                        }
                                     })
                                 }).on("error", function(error){
                                     res.end();
@@ -94,6 +95,9 @@ function handler(link, req, res, onRemote){
                     }
                 } 
             })
+        res.on("close", function(){
+            end = true
+        });
         }catch(e){
             res.end()
             util.error(e)
