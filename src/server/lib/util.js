@@ -1,15 +1,16 @@
 var fs = require("fs")
 var path = require("path")
 var crypto = require('crypto');
+var moment = require('moment');
 var config = require('../config');
-var { debug, error } = require('./log');
+var logger = require('./log');
 
 module.exports.logger = function(log){
-    if(log) debug.debug(log)
+    if(log) logger.debug.debug(log)
 }
 
 module.exports.error = function(error){
-    if(error) error.error("ERROR: ", error)
+    if(error) logger.error.error(error)
 }
 
 module.exports.getId = function(link){
@@ -107,4 +108,9 @@ module.exports.getHomePath = function getHomePath(){
 
 module.exports.getDefaultPath = function getDefaultPath(){
     return config.MATEDATA_SAVE_DIR;
+}
+
+module.exports.getYesterdayTime = function getYesterdayTime(){
+    var yesterday = moment(new Date().getTime() - 86400 * 1000).format("YYYY-MM-DD 00:00:00");
+    return new Date(yesterday).getTime()
 }

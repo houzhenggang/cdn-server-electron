@@ -7,7 +7,9 @@ var queue = require('./queue');
 var ram = require('./ram');
 var proxyHandler = require('./proxy');
 
-module.exports.update = function(option){
+var updateing = false;
+module.exports.update = function(option, callback){
+    if(!callback) callback = function(){}
     option = Object.assign({
         r: "video/list",
         channel: "",
@@ -18,8 +20,34 @@ module.exports.update = function(option){
         if (!error && response.statusCode == 200) {
             var data = JSON.parse(body);
             queue.adds(data.data)
+            callback(null, data)
         }
     })
+}
+
+module.exports.runUpdateTimer = function(option, time){
+    setInterval(function(){
+        if(!updateing){
+            module.exports.runUpdate(option)
+        }
+    }, time);
+}
+
+module.exports.runUpdate = function(option){
+    updateing = true
+    option = Object.assign({
+        page: 1,
+        pageSize: 100,
+    }, option)
+    module.exports.update(option, function(error, data){
+        if(data.data.length >= option.pageSize){
+            option.page++;
+            module.exports.runUpdate(option);
+        }else{
+            updateing = false;
+        }
+    })
+
 }
 
 module.exports.runQueue = function(taskNum){
@@ -63,7 +91,7 @@ module.exports.preload = function(link, res, callback){
                 callback(e)
             }
         }else{
-            callback("Error: " + code + " " + response.statusMessage);
+            callback(link + " " + code + " " + response.statusMessage);
         }
     })
 }

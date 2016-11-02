@@ -11,6 +11,7 @@
     "http-proxy": "^1.15.2",
     "log4js": "^0.6.38",
     "minimist": "^1.2.0",
+    "moment": "^2.15.2",
     "nedb": "^1.8.0",
     "pump": "^1.0.1",
     "range-parser": "^1.2.0",

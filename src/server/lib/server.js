@@ -13,7 +13,8 @@ var config = require('../config');
 var proxy = httpProxy.createProxyServer({});
 proxy.on('proxyRes', proxyHandler.handler)
 task.runClear(24 * 3 * 3600 * 1000, 3600 * 1000); //过期时间三天
-task.update({page: 40, pageSize: 10})
+task.runUpdate({pageSize: 10, create_time:  parseInt(util.getYesterdayTime() / 1000)})
+task.runUpdateTimer({page: 1, pageSize: 100}, 3600 * 1000)
 task.runQueue(2)
 
 
@@ -38,7 +39,7 @@ function onHttp(req, res){
         }
         proxyHandler.process(req.url, response, res)
     }), res)
-    util.logger("From the remote data") 
+    util.logger(req.url + " From the remote data") 
 }
 
 function handler(link, req, res, onRemote){
@@ -56,6 +57,7 @@ function handler(link, req, res, onRemote){
                     if(range && (range.start > cacheFile.mateDataSize || range.start > file.length )){
                         return onRemote(req, res)
                     }else{
+                        console.info(range)
                         if (!range) range = {start:0, end:cacheFile.cacheLength}
                         res.statusCode = 206
                         res.setHeader('Accept-Ranges', 'bytes')
@@ -88,7 +90,7 @@ function handler(link, req, res, onRemote){
                                 })
                             }
                         })
-                        util.logger("From the local cache")
+                        util.logger(link + " From the local cache")
                     }
                 } 
             })

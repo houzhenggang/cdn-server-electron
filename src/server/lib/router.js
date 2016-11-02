@@ -8,23 +8,28 @@ router.GET = {};
 router.POST = {};
 
 router.runAction = function(req, res){
-    var method = req.method;
-    res.jsonOutput = function(data){
-        res.writeHead(200, {
-            'Content-Type': 'application/json',
-        });
-        res.end(JSON.stringify(data));
-    }
-    var path = url.parse(req.url, true).pathname;
-    if(typeof router[method][path] == "function"){
-        parseParam(req, function(params){
-            params.get = function(key, defaultValue){
-                return params[key] !== undefined ? params[key] : defaultValue
-            }
-            router[method][path](req, res, params);
-        })
-    }else{
-        res.writeHead(404, {'Content-Type': 'text/html'});
+    try{
+        var method = req.method;
+        res.jsonOutput = function(data){
+            res.writeHead(200, {
+                'Content-Type': 'application/json',
+            });
+            res.end(JSON.stringify(data));
+        }
+        var path = url.parse(req.url, true).pathname;
+        if(typeof router[method][path] == "function"){
+            parseParam(req, function(params){
+                params.get = function(key, defaultValue){
+                    return params[key] !== undefined ? params[key] : defaultValue
+                }
+                router[method][path](req, res, params);
+            })
+        }else{
+            res.writeHead(404, {'Content-Type': 'text/html'});
+            res.end();
+        }
+    }catch(e){
+        res.writeHead(504, {'Content-Type': 'text/html'});
         res.end();
     }
 }

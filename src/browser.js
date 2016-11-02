@@ -110,9 +110,9 @@ function createTray(){
     }));
     appIcon.setContextMenu(trayMenu)
     appIcon.on('click', function (e) {
-        e.preventDefault()
-        //mainWindow.show();
-        appIcon.popUpContextMenu(trayMenu)
+        mainWindow.show();
+        //e.preventDefault()
+        //appIcon.popUpContextMenu(trayMenu)
     })
 
 }
