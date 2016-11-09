@@ -12,34 +12,42 @@ var config = require('../config');
 
 var proxy = httpProxy.createProxyServer({});
 proxy.on('proxyRes', proxyHandler.handler)
-task.runClear(24 * 3 * 3600 * 1000, 3600 * 1000); //过期时间三天
+/*task.runClear(24 * 3 * 3600 * 1000, 3600 * 1000); //过期时间三天
 task.runUpdate({pageSize: 10, create_time:  parseInt(util.getYesterdayTime() / 1000)})
-task.runUpdateTimer({page: 1, pageSize: 100}, 3600 * 1000)
-task.runQueue(2)
+task.runUpdateTimer({page: 1, pageSize: 100}, 300 * 1000)
+task.runQueue(2)*/
 
 
 function onProxy(req, res){
-    var host = req.headers.host, ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-    proxy.web(req, res, { target: 'http://' + host });
-    util.logger("From the remote data") 
+    try{
+        var host = req.headers.host, ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+        proxy.web(req, res, { target: 'http://' + host });
+        util.logger("From the remote data") 
+    }catch(e){
+        util.error(e) 
+    }
 }
 
 function onHttp(req, res){
-    var link = config.REMOTE_IP + req.url
-    pump(request({
-        url: link,
-        headers:{
-            'Range': req.headers['range'],
-            "Host": config.REMOTE_HOST.replace("http://", ""),
-        }
-    }).on("response", function(response){
-        if(!response.headers["content-range"]) {
-            var length = response.headers["content-length"];
-            response.headers["content-range"] = "bytes 0-" + length + "/" + length
-        }
-        proxyHandler.process(req.url, response, res)
-    }), res)
-    util.logger(req.url + " From the remote data") 
+    try{
+        var link = config.REMOTE_IP + req.url
+        pump(request({
+            url: link,
+            headers:{
+                'Range': req.headers['range'],
+                "Host": config.REMOTE_HOST.replace("http://", ""),
+            }
+        }).on("response", function(response){
+            if(!response.headers["content-range"]) {
+                var length = response.headers["content-length"];
+                response.headers["content-range"] = "bytes 0-" + length + "/" + length
+            }
+            proxyHandler.process(req.url, response, res)
+        }), res)
+        util.logger(req.url + " From the remote data") 
+    }catch(e){
+        util.error(e)
+    }
 }
 
 function handler(link, req, res, onRemote){

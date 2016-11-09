@@ -71,30 +71,34 @@ module.exports.runTask = function(task, worker, i){
 }
 
 module.exports.preload = function(link, res, callback){
-    var ipLink = link.replace(config.REMOTE_HOST, config.REMOTE_IP)
-    request({
-        url: ipLink,
-        headers:{
-            "Host": config.REMOTE_HOST.replace("http://", ""),
-        }
-    }).on("response", function(response){
-        var stream = this;
-        var code = response.statusCode;
-        if(code == 200 || code == 206){
-            try{
-                var length = response.headers["content-length"];
-                response.headers["content-range"] = "bytes 0-" + length + "/" + length
-                proxyHandler.process(link, response, res, function(){
-                    stream.abort()
-                    callback(null)
-                })
-            }catch(e){
-                callback(e)
+    try{
+        var ipLink = link.replace(config.REMOTE_HOST, config.REMOTE_IP)
+        request({
+            url: ipLink,
+            headers:{
+                "Host": config.REMOTE_HOST.replace("http://", ""),
             }
-        }else{
-            callback(link + " " + code + " " + response.statusMessage);
-        }
-    })
+        }).on("response", function(response){
+            var stream = this;
+            var code = response.statusCode;
+            if(code == 200 || code == 206){
+                try{
+                    var length = response.headers["content-length"];
+                    response.headers["content-range"] = "bytes 0-" + length + "/" + length
+                    proxyHandler.process(link, response, res, function(){
+                        stream.abort()
+                        callback(null)
+                    })
+                }catch(e){
+                    callback(e)
+                }
+            }else{
+                callback(link + " " + code + " " + response.statusMessage);
+            }
+        })
+    }catch(e){
+        util.error(e)
+    }
 }
 
 module.exports.runClear = function(overTime, interval){

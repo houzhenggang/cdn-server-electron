@@ -38,7 +38,12 @@ function zipAsset (asset) {
       return reject(new Error(`${asset.path} does not exist`))
     }
 
-    const zipCommand = `zip --recurse-paths --symlinks '${asset.name}' '${assetBase}'`
+    //win 手动压缩
+    asset.path = path.join(assetDirectory, asset.name)
+    resolve(asset)
+
+    //linux
+    /*const zipCommand = `zip --recurse-paths --symlinks '${asset.name}' '${assetBase}'`
     const options = {cwd: assetDirectory, maxBuffer: Infinity}
     childProcess.exec(zipCommand, options, (error) => {
       if (error) {
@@ -47,14 +52,13 @@ function zipAsset (asset) {
         asset.path = path.join(assetDirectory, asset.name)
         resolve(asset)
       }
-    })
+    })*/
   })
 }
 
 function zipAssets () {
   const outPath = path.join(__dirname, '..', 'out')
-
-  const zipAssets = [{
+  /*const zipAssets = [{
     name: 'electron-api-demos-mac.zip',
     path: path.join(outPath, 'Electron API Demos-darwin-x64', 'Electron API Demos.app')
   }, {
@@ -63,6 +67,10 @@ function zipAssets () {
   }, {
     name: 'electron-api-demos-linux.zip',
     path: path.join(outPath, 'Electron API Demos-linux-x64')
+  }]*/
+  const zipAssets = [{
+    name: 'cdn-server-electron-windows.zip',
+    path: path.join(outPath, 'cdn-server-electron-win32-ia32')
   }]
 
   return Promise.all(zipAssets.map(zipAsset)).then((zipAssets) => {
@@ -70,18 +78,18 @@ function zipAssets () {
       name: 'RELEASES',
       path: path.join(outPath, 'windows-installer', 'RELEASES')
     }, {
-      name: 'ElectronAPIDemosSetup.exe',
-      path: path.join(outPath, 'windows-installer', 'ElectronAPIDemosSetup.exe')
+      name: 'DotCDN.exe',
+      path: path.join(outPath, 'windows-installer', 'DotCDN.exe')
     }, {
-      name: `ElectronAPIDemos-${version}-full.nupkg`,
-      path: path.join(outPath, 'windows-installer', `ElectronAPIDemos-${version}-full.nupkg`)
+      name: `cdn-server-electron-${version}-full.nupkg`,
+      path: path.join(outPath, 'windows-installer', `cdn-server-electron-${version}-full.nupkg`)
     }])
   })
 }
 
 function createRelease (assets) {
   const options = {
-    uri: 'https://api.github.com/repos/electron/electron-api-demos/releases',
+    uri: 'https://api.github.com/repos/pk8est/cdn-server-electron/releases',
     headers: {
       Authorization: `token ${token}`,
       'User-Agent': `node/${process.versions.node}`

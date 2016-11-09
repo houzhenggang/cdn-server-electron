@@ -20,7 +20,7 @@ gulp.task('clean', function (callback) {
 });
 
 gulp.task('copy', function () {
-    gulp.src(['./src/browser.js', './src/app.config.js', './src/*.html'])
+    gulp.src(['./src/browser.js', './src/auto-updater.js', './src/app.config.js', './src/*.html'])
         .pipe(gulp.dest('./app'));
     gulp.src(['./src/assets/**'])
         .pipe(gulp.dest('./app/assets'));

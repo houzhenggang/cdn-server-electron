@@ -6,12 +6,22 @@ const JSZip = require('jszip');
 import { remote } from 'electron';
 const config = require('../../server/config');
 
+const app = remote.app
 const dialog = remote.dialog
+const appRootDir = remote.getGlobal('appRootDir');
 //const terminate = remote.getGlobal('terminate');
 //const updateStatus = remote.getGlobal('updateStatus');
 
 const error = (...arg) => {
     console.error(...arg)
+}
+
+const getAppRootDir = () => {
+    if(appRootDir.indexOf(".asar") != -1){
+        return path.dirname(path.dirname(appRootDir))
+    }else{
+        return appRootDir
+    }
 }
 
 const isNewVersion = (v1, v2) => {
@@ -53,9 +63,13 @@ const downloadUrl = (url) => {
                 'User-Agent': 'http://developer.github.com/v3/'
             }
         }).on("response", (response) => {
+            let size = 0;
+            let length = response.headers["content-length"];
             const bufs = [];
             response.on('data', (b) => {
                 bufs.push(b);
+                size += b.length
+                console.info(size+"/"+length)
             });
             response.on('end', () => {
                 resolve(Buffer.concat(bufs));
@@ -143,11 +157,27 @@ const downloadUpdate = (release) => {
 
 const writeFile = (filename, data) => {
     return new Promise((resolve, reject) => {
-        fs.writeFile(filename, data, function(error){
+        /*fs.writeFile(filename, data, {mode: "0666", flag: "w+"}, function(error){
             if (error) {
                 reject(error);
             } else {
                 resolve();
+            }
+        })*/
+        let tempFilename = filename.substr(filename.length-5) == ".asar" ? `${filename}.temp` : null
+        console.info(tempFilename)
+        fs.writeFile(tempFilename || filename, data, {mode: "0777", flag: "w+"}, function(error){
+            if (error) {
+                reject(error);
+            } else {
+                if(tempFilename){
+                    fs.rename(tempFilename, filename, function(err){
+                        if(err)reject(err);
+                        else resolve()
+                    })
+                }else{
+                    resolve();
+                }
             }
         })
     })
@@ -159,17 +189,22 @@ const applyUpdate = (zip) => {
     }
     const promises = [];
     const files = zip.files;
+    const _appRootDir = getAppRootDir()
+    console.info(files)
     for (var filename in files) {
         if (files.hasOwnProperty(filename)) {
-            const file = files[filename];
+            let file = files[filename];
             if (file.dir) {
-                mkdirp.sync(path.join(global.dirname, filename));
+                console.info(path.join(_appRootDir, filename))
+                mkdirp.sync(path.join(_appRootDir, filename));
             } else {
                 const buffer = files[filename].asNodeBuffer();
-                promises.push(writeFile(path.join(global.dirname, filename), buffer));
+                console.info(path.join(_appRootDir, filename))
+                promises.push(writeFile(path.join(_appRootDir, filename), buffer));
             }
         }
     }
+    console.info(promises)
     return Promise.all(promises).then(() => {
         dialog.showMessageBox({
             buttons: ['OK'],

@@ -1,6 +1,6 @@
 const fs = require("fs")
 const log4js = require('log4js');
-const dir = "./log"
+const dir = "D:\\cdn-server\\log"//"./log"
 
 mkLogdir()
 log4js.configure({

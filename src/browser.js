@@ -1,11 +1,22 @@
 const path = require('path');
 const electron = require('electron');
+const minimist = require('minimist')
 const server = require("./server/boot")
+const config = require('./server/config');
+const autoUpdater = require('./auto-updater')
 const {app, ipcMain, BrowserWindow, dialog, Tray, Menu, MenuItem} = electron;
 
-if (handleSquirrelEvent()) {
+var argv = minimist(process.argv.slice(2), {
+    alias: {debug: 'd', port: 'p'},
+    "default": {
+        debug: false,
+        port: config.DEFAULT_PORT,
+    }
+});
+
+/*if (handleSquirrelEvent()) {
   return;
-}
+}*/
 
 var shouldStartInstance = app.makeSingleInstance(function(commandLine, workingDirectory) {
     if (mainWindow) {
@@ -25,8 +36,7 @@ if (shouldStartInstance) {
     return;
 }
 
-global.dirname = __dirname
-server.run(function(host){
+server.run(argv.port, function(host){
   global.host = host;
 })
 
@@ -36,6 +46,7 @@ let mainWindow;
 let exiting = false;
 let shouldQuit = false;
 
+global.appRootDir = __dirname
 global.updateStatus = (function () {
     let status = '';
     return {
@@ -69,7 +80,9 @@ function createWindow() {
   });
   mainWindow.loadURL(`file://${__dirname}/index.html`);
 
-  mainWindow.webContents.openDevTools();
+  if(argv.debug){
+    mainWindow.webContents.openDevTools();
+  }
 
   mainWindow.on('closed', () => {
     mainWindow = null;
@@ -110,9 +123,9 @@ function createTray(){
     }));
     appIcon.setContextMenu(trayMenu)
     appIcon.on('click', function (e) {
-        mainWindow.show();
-        //e.preventDefault()
-        //appIcon.popUpContextMenu(trayMenu)
+        //mainWindow.show();
+        e.preventDefault()
+        appIcon.popUpContextMenu(trayMenu)
     })
 
 }
@@ -151,7 +164,6 @@ function handleSquirrelEvent() {
   const rootAtomFolder = path.resolve(appFolder, '..');
   const updateDotExe = path.resolve(path.join(rootAtomFolder, 'Update.exe'));
   const exeName = path.basename(process.execPath);
-  //const exeName = path.basename("DotApp.exe");
 
   const spawn = function(command, args) {
     let spawnedProcess, error;
@@ -166,39 +178,38 @@ function handleSquirrelEvent() {
   const spawnUpdate = function(args) {
     return spawn(updateDotExe, args);
   };
-
   const squirrelEvent = process.argv[1];
   switch (squirrelEvent) {
     case '--squirrel-install':
     case '--squirrel-updated':
-      // Optionally do things such as:
-      // - Add your .exe to the PATH
-      // - Write to the registry for things like file associations and
-      //   explorer context menus
-
-      // Install desktop and start menu shortcuts
       spawnUpdate(['--createShortcut', exeName]);
-
       setTimeout(app.quit, 1000);
       return true;
-
     case '--squirrel-uninstall':
-      // Undo anything you did in the --squirrel-install and
-      // --squirrel-updated handlers
-
-      // Remove desktop and start menu shortcuts
       spawnUpdate(['--removeShortcut', exeName]);
-
       setTimeout(app.quit, 1000);
       return true;
-
+    case '--squirrel-firstrun':
+      break;
     case '--squirrel-obsolete':
-      // This is called on the outgoing version of your app before
-      // we update to the new version - it's the opposite of
-      // --squirrel-updated
-
       app.quit();
       return true;
   }
 };
-
+//autoUpdater.checkUpdate(function () { app.quit() })
+//require('./server/lib/util').logger(process.argv[1])
+// Handle Squirrel on Windows startup events
+switch (process.argv[1]) {
+  case '--squirrel-install':
+    autoUpdater.createShortcut(function () { app.quit() })
+    break
+  case '--squirrel-uninstall':
+    autoUpdater.removeShortcut(function () { app.quit() })
+    break
+  case '--squirrel-obsolete':
+  case '--squirrel-updated':
+    app.quit()
+    break
+  default:
+    //initialize()
+}
